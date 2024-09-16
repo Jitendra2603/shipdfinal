@@ -1,20 +1,20 @@
 services:
-  frontend:
+  web:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./client
     ports:
       - "3000:3000"
     volumes:
-      - .:/usr/src/app
+      - ./client:/app
     environment:
-      - NODE_ENV=development
+      NODE_ENV: development
     command: npm run dev
 
-  frontend-test:
+  test:
     build:
-      context: .
-      dockerfile: Dockerfile.test
+      context: ./client
     volumes:
-      - .:/usr/src/app
+      - ./client:/app
+    environment:
+      NODE_ENV: development
     command: npm run test
