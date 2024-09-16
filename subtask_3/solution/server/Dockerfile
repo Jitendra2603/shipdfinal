@@ -1,20 +1,26 @@
 # Use an official Python runtime as a parent image
-FROM python:3.9-slim
+FROM python:3.8-slim
 
-# Set the working directory in the container
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+# Set work directory
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
-
-# Install any needed packages specified in requirements.txt
+# Install dependencies
+COPY requirements.txt .
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install the testing dependencies
-RUN pip install pytest fastapi[testclient]
+# Copy project
+COPY . .
 
-# Expose the port for FastAPI
-EXPOSE 8000
+# Install pytest for testing
+RUN pip install pytest
 
-# Command to run the tests
-CMD ["pytest", "test_main.py"]
+# Expose port
+EXPOSE 80
+
+# Define the default command to run the app
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
