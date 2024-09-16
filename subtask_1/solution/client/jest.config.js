@@ -1,14 +1,7 @@
-// jest.config.js
-const nextJest = require("next/jest");
-
-const createJestConfig = nextJest({
-  dir: "./",
-});
-
-const customJestConfig = {
-  setupFilesAfterEnv: ["solution/client/jest.setup.js"],
+module.exports = {
   testEnvironment: "jsdom",
-  testMatch: ["solution/client/tests/**/*.test.(js|jsx|ts|tsx)"], // Include the tests folder
+  setupFilesAfterEnv: ["@testing-library/jest-dom/extend-expect"],
+  moduleNameMapper: {
+    "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+  }
 };
-
-module.exports = createJestConfig(customJestConfig);
