@@ -1,5 +1,3 @@
----
-
 The overall task is to create a secure web-based Python code runner that allows users to write, execute, and submit Python code through an interactive interface. The application comprises the following components:
 
 - **Frontend**: A user-friendly code editor with syntax highlighting, where users can input Python code.
@@ -18,6 +16,6 @@ Key considerations include:
 You will implement this project step-by-step through the following subtasks:
 
 1. **Subtask 1**: Implement the frontend code editor.
-2. **Subtask 2**: Develop the backend API for code execution.
+2. **Subtask 2**: Develop the backend API and integrate it with the frontend.
 3. **Subtask 3**: Enhance the backend to execute code securely using Docker.
 4. **Subtask 4**: Implement database functionality to save submitted code and outputs.
