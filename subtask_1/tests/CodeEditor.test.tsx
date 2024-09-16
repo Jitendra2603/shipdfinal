@@ -1,6 +1,6 @@
 import React from "react";
 import { render, fireEvent, screen, waitFor } from "@testing-library/react";
-import CodeEditor from "../solution/client/app/components/CodeEditor";
+import CodeEditor from "../app/components/CodeEditor";
 import "@testing-library/jest-dom/extend-expect";
 
 describe("CodeEditor Component", () => {
