@@ -1,0 +1,21 @@
+version: '3.9'  # Updated version to resolve warning
+
+services:
+  web:
+    build:
+      context: ./
+    ports:
+      - "8000:80"
+    environment:
+      - DATABASE_URL=sqlite:///./test.db
+
+  test:
+    build:
+      context: ./
+    command: pytest --maxfail=1 --disable-warnings -v
+    volumes:
+      - ./server:/app
+    depends_on:
+      - web
+    environment:
+      - DATABASE_URL=sqlite:///./test.db
