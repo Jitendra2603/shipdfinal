@@ -1,55 +1,46 @@
+# Subtask 1: Basic Frontend Setup with Code Editor
 
-# Subtask 1: Frontend Code Editor
-
-Your task is to implement a frontend code editor that allows users to write Python code. The editor should have the following features:
-
-### Features:
-
-1. **Syntax Highlighting**: Support for Python syntax highlighting.
-2. **Code Input Area**: A text editor where users can write their Python code.
-3. **Run Code Button**: A button that sends the code to the backend API for execution.
-4. **Output Display**: An area where the output or error messages from the code execution are displayed.
-
----
-
-### Specifications:
-
-- **API Endpoint**: When the "Run Code" button is clicked, the editor should send a POST request to the backend API endpoint `/run_code`.
-  
-- **Payload Structure**: The POST request should have a JSON body with a single key `"code"` containing the code as a string.
-
-#### Example payload:
-
-```json
-{
-  "code": "print('Hello, World!')"
-}
-```
-
-- **Response Handling**: The frontend should handle the response from the backend, which will be a JSON object containing the keys `"output"`, `"error"`, and `"success"`. Display the `"output"` or `"error"` in the output display area accordingly.
-
-#### Example backend response:
-
-```json
-{
-  "output": "Hello, World!\n",
-  "error": "",
-  "success": true
-}
-```
+### Objective:
+Set up a basic frontend application with a code editor component that allows users to write Python code.
 
 ---
 
 ### Requirements:
 
-- **Use React and Next.js** for the frontend implementation.
-- Ensure the **UI is responsive** and user-friendly.
-- Handle user inputs and outputs gracefully, providing feedback where necessary.
-- Since the backend is not yet implemented, you can **mock the API response** in your frontend code to simulate the interaction.
+1. **Initialize a React project** using **Create React App** or **Next.js**.
+
+2. **Install dependencies**:
+    - Install React and React DOM.
+    - Install **CodeMirror** for the code editor functionality. Use `@uiw/react-codemirror` and `@codemirror/lang-python` for React integration and Python syntax highlighting.
+
+3. **Create a CodeEditor component** that:
+    - Renders a code editor with **Python syntax highlighting**.
+    - Uses **CodeMirror** for the code editor.
+    - Initializes with the text `# Write your Python code here`.
+
+4. **Set up the main application** to:
+    - Render the **CodeEditor** component.
+    - Ensure that the application runs without errors.
+
+5. **No backend integration** is required at this stage.
 
 ---
 
-### Notes:
+### File Structure:
 
-- Prepare your frontend code to be ready to integrate with the backend API in the next subtasks.
-- Include all necessary files and assets so that the application can run independently at this stage.
+```bash
+src/
+  App.js (or App.tsx if using TypeScript)
+  index.js
+  components/
+    CodeEditor.js (or .tsx)
+package.json
+```
+
+---
+
+### Instructions:
+
+- Do not include any global CSS or additional layout components at this stage.
+- Focus only on setting up the code editor with **Python syntax highlighting**.
+- Ensure that the application can run independently with `npm start` (or `npm run dev` if using Next.js).
