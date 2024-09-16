@@ -32,6 +32,30 @@ export default function CodeEditor() {
     }
   };
 
+  const handleSubmitCode = async () => {
+    const payload = { code };
+    try {
+      const response = await fetch("http://localhost:8000/submit_code", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      if (data.db_success) {
+        setOutput(data.code_output.output);
+        setHasError(false);
+        alert("Code saved successfully!");
+      } else {
+        setOutput(data.code_output.error || data.error);
+        setHasError(true);
+        alert("Code execution failed. Not saved.");
+      }
+    } catch (error) {
+      setOutput("Error connecting to backend API.");
+      setHasError(true);
+    }
+  };
+
   return (
     <div className="w-full grow relative z-10">
       <div className="flex flex-col items-stretch justify-self-start">
@@ -46,6 +70,7 @@ export default function CodeEditor() {
         />
         <div className="min-w-full flex flex-row items-center justify-between">
           <Button text="Run Code" onClick={handleRunCode} className="rounded-button neon-text" />
+          <Button text="Submit Code" onClick={handleSubmitCode} className="rounded-button neon-text" />
         </div>
         <div className="output-container">
           <textarea
@@ -59,3 +84,4 @@ export default function CodeEditor() {
     </div>
   );
 }
+
