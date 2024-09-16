@@ -1,0 +1,47 @@
+version: '3.8'  # You can update this to the latest version if needed
+
+services:
+  web:
+    build:
+      context: ./solution/server
+      dockerfile: Dockerfile
+    ports:
+      - "8000:80"
+    depends_on:
+      - db
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db/postgres
+      - DOCKER_HOST=tcp://host.docker.internal:2375  # Point to Docker daemon via TCP
+    networks:
+      - app-network
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  test:
+    build:
+      context: ./solution/server
+      dockerfile: Dockerfile
+    command: ["pytest", "/app/tests/"]
+    depends_on:
+      - web
+      - db
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@db/postgres
+      - DOCKER_HOST=tcp://host.docker.internal:2375  # Point to Docker daemon via TCP
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+
+networks:
+  app-network:
