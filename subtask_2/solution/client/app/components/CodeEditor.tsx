@@ -12,18 +12,6 @@ export default function CodeEditor() {
 
   const handleRunCode = async () => {
     const payload = { code };
-    // Mock API response for testing
-    const mockResponse = { output: "Hello, World!\n", error: "", success: true };
-    await new Promise((resolve) => setTimeout(resolve, 500)); // Simulate network delay
-    if (mockResponse.success) {
-      setOutput(mockResponse.output);
-      setHasError(false);
-    } else {
-      setOutput(mockResponse.error);
-      setHasError(true);
-    }
-    // Prepare for real API integration in the next subtask
-    /*
     try {
       const response = await fetch("http://localhost:8000/run_code", {
         method: "POST",
@@ -42,7 +30,6 @@ export default function CodeEditor() {
       setOutput("Error connecting to backend API.");
       setHasError(true);
     }
-    */
   };
 
   return (
