@@ -27,3 +27,22 @@ Your task is to implement a frontend code editor that allows users to write Pyth
 ```
 Ensure the UI is responsive and user-friendly.
 Mock the backend API response initially to test the frontend implementation.
+Endpoint Details:
+
+Endpoint URL: http://127.0.0.1:8000/run_code
+Method: POST
+Headers: Content-Type: application/json
+Payload:
+```json
+Copy code
+{
+  "code": "<user_code_here>"
+}
+```
+Response:
+```json
+{
+  "output": "<execution_output>",
+  "error": "<error_messages>",
+  "success": <boolean>
+}
