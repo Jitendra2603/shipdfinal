@@ -1,6 +1,6 @@
 import unittest
 from fastapi.testclient import TestClient
-from solution.main import app
+from solution.server.main import app
 
 client = TestClient(app)
 
@@ -12,7 +12,7 @@ class TestBackendAPI(unittest.TestCase):
         response = client.post("/run_code", json={"code": code})
         data = response.json()
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data["output"].strip(), "Hello, World!")
+        self.assertEqual(data["output"], "Hello, World!\n")
         self.assertTrue(data["success"])
 
     def test_run_code_error(self):
