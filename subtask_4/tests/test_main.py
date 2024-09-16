@@ -1,8 +1,8 @@
 import unittest
 from fastapi.testclient import TestClient
-from solution.main import app, Base, engine
+from server.main import app, Base, engine, get_db
 from sqlalchemy.orm import sessionmaker
-from solution.models import CodeSubmission
+from solution.server.models import CodeSubmission
 
 client = TestClient(app)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
