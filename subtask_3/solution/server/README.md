@@ -1,4 +1,4 @@
-avigate to the subtask_3 Directory
+Navigate to the subtask_3 Directory
 
 Open your terminal or command prompt and navigate to the subtask_3 directory:
 
