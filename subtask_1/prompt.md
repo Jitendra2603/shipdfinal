@@ -29,9 +29,8 @@ Set up a basic frontend application with a code editor component that allows use
 ### File Structure:
 
 ```bash
-src/
-  App.js (or App.tsx if using TypeScript)
-  index.js
+client/
+  app/
   components/
     CodeEditor.js (or .tsx)
 package.json
