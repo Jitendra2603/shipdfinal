@@ -1,26 +1,25 @@
 # Use an official Python runtime as a parent image
 FROM python:3.8-slim
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# Install Docker inside the container
+RUN apt-get update && \
+    apt-get install -y docker.io && \
+    rm -rf /var/lib/apt/lists/*
 
-# Set work directory
+# Set the working directory
 WORKDIR /app
 
-# Install dependencies
-COPY requirements.txt .
-RUN pip install --upgrade pip
+# Copy the requirements file
+COPY requirements.txt ./
+
+# Install the required packages
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project
-COPY . .
+# Copy the rest of the application code
+COPY . /app
 
-# Install pytest for testing
-RUN pip install pytest
-
-# Expose port
+# Expose port 80
 EXPOSE 80
 
-# Define the default command to run the app
+# Run the application
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]
