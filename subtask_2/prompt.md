@@ -41,4 +41,4 @@ Update the frontend to make actual API calls to the backend.
 Additional Notes:
 
 The endpoint name and payload structure should match exactly what the frontend is expecting, as defined in Subtask 1.
-Include all necessary files and configurations to run the backend independently at this stage.
+Include all necessary files and configurations to run the backend independently at this stage like uvicorn config, requirements, etc. in the server folder
