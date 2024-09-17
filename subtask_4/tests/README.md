@@ -51,7 +51,7 @@ services:
 
 volumes:
   postgres_data:
-Run the Tests
+
 ```
 Execute the tests using the tests service:
 
