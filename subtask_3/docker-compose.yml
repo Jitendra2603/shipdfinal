@@ -1,47 +1,16 @@
-version: '3.8'  # You can update this to the latest version if needed
+
 
 services:
-  web:
-    build:
-      context: ./solution/server
-      dockerfile: Dockerfile
+  backend:
+    build: ./solution/server
     ports:
       - "8000:80"
-    depends_on:
-      - db
-    environment:
-      - DATABASE_URL=postgresql://postgres:password@db/postgres
-      - DOCKER_HOST=tcp://host.docker.internal:2375  # Point to Docker daemon via TCP
-    networks:
-      - app-network
-
-  db:
-    image: postgres:13
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: postgres
     volumes:
-      - postgres_data:/var/lib/postgresql/data
-    networks:
-      - app-network
-
-  test:
-    build:
-      context: ./solution/server
-      dockerfile: Dockerfile
-    command: ["pytest", "/app/tests/"]
-    depends_on:
-      - web
-      - db
+      - /var/run/docker.sock:/var/run/docker.sock  # Needed to run Docker inside Docker
     environment:
-      - DATABASE_URL=postgresql://postgres:password@db/postgres
-      - DOCKER_HOST=tcp://host.docker.internal:2375  # Point to Docker daemon via TCP
-    networks:
-      - app-network
+      - PYTHONUNBUFFERED=1
 
-volumes:
-  postgres_data:
-
-networks:
-  app-network:
+  frontend:
+    build: ./solution/client
+    ports:
+      - "3000:3000"
