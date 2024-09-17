@@ -1,4 +1,4 @@
-# Subtask 4: Save Submitted Code and Output to Database
+# Subtask 4: Save Submitted Code and Output to Database and CSS
 
 Implement functionality to save the submitted code and its output to a database. The enhancements should include:
 
@@ -50,3 +50,5 @@ Additional Notes:
 The code should only be saved to the database if the code execution was successful (success: true).
 If the code execution fails, return appropriate error messages and do not save the submission to the database.
 Update the frontend to handle the new endpoint and provide user feedback.
+
+Add CSS using globals.css file and layout.tsx file.
