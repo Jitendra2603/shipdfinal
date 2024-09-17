@@ -7,7 +7,7 @@ Set up a basic frontend application with a code editor component that allows use
 
 ### Requirements:
 
-1. **Initialize a React project** using **Create React App** or **Next.js**.
+1. **Initialize a React project** using  **Next.js**.
 
 2. **Install dependencies**:
     - Install React and React DOM.
@@ -26,20 +26,12 @@ Set up a basic frontend application with a code editor component that allows use
 
 ---
 
-### File Structure:
-
-```bash
-client/
-  app/
-  components/
-    CodeEditor.js (or .tsx)
-package.json
-```
-
----
-
 ### Instructions:
 
 - Do not include any global CSS or additional layout components at this stage.
 - Focus only on setting up the code editor with **Python syntax highlighting**.
-- Ensure that the application can run independently with `npm start` (or `npm run dev` if using Next.js).
+- Ensure there is a background video playing for the UI, it should be located in public/video folder named wave-loop.mp4
+- Ensure ther is an favicon.ico file too
+- solution/client/app/components
+- /public/video
+  
