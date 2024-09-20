@@ -2,7 +2,7 @@
 Tests
 ---
 ```
-git clone https://github.com/Jitendra2603/shipdfinal/.git
+git clone https://github.com/Jitendra2603/shipdfinal.git
 ```
 ```
 cd shipdfinal/subtask_2/solution/server
