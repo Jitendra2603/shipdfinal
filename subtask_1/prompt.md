@@ -28,10 +28,11 @@ Set up a basic frontend application with a code editor component that allows use
 
 ### Instructions:
 
-- Do not include any global CSS or additional layout components at this stage.
+- Do not include any global CSS at this stage.
 - Focus only on setting up the code editor with **Python syntax highlighting**.
 - Ensure there is a background video playing for the UI, it should be located in public/video folder named wave-loop.mp4
 - Ensure ther is an favicon.ico file too
 - solution/client/app/components
 - /public/video
+- The Frontend should have "Datacurve" written somewhere.
   
