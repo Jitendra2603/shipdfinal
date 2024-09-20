@@ -5,13 +5,13 @@ FROM node:18-alpine
 WORKDIR /app
 
 # Copy package.json and package-lock.json
-COPY client/package*.json ./
+COPY package*.json ./
 
 # Install dependencies
 RUN npm install
 
 # Copy the rest of the application code
-COPY client/ ./
+COPY . ./
 
 # Build the Next.js application
 RUN npm run build
@@ -20,4 +20,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Start the Next.js application
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "dev"]
