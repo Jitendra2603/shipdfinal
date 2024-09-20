@@ -1,16 +1,28 @@
+```
+git clone https://github.com/Jitendra2603/shipdfinal.git
+```
+```
+cd shipdfinal/subtask_1
+```
+
 Make the test script executable:
 
 ```
-chmod +x tests/test.sh
+chmod +x solution/client/tests/test.sh
 ```
 Run the test script:
 ```
 ./tests/test.sh
 ```
-Navigate to the subtask_1/solution directory:
+or 
+```
+sh solution/client/tests/test.sh
+```
+
+Navigate to the subtask_1/solution/client directory:
 
 ```
-cd subtask_1/solution
+cd subtask_1/solution/client
 ```
 Build the Docker image using Docker Compose:
 
@@ -37,4 +49,8 @@ Run the HTTP test script:
 
 ```
 ./tests/check_http.sh
+```
+or 
+```
+sh solution/client/tests/test.sh
 ```
