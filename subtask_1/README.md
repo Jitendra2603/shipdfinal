@@ -18,6 +18,8 @@ or
 ```
 sh solution/client/tests/test.sh
 ```
+> [!Note]
+> On windows, you can directly run the above command on Git bash
 
 Navigate to the subtask_1/solution/client directory:
 
@@ -54,3 +56,5 @@ or
 ```
 sh solution/client/tests/test.sh
 ```
+> [!Note]
+> On Windows, you can directly run the above command in Git Bash
