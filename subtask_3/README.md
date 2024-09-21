@@ -8,8 +8,10 @@ cd C:\shipdfinal\subtask_3
 
 > [!Note]
 > Only for Windows: Ensure Docker Daemon is Listening on TCP Port 2375
+
 > [!Caution]
 > Exposing the TCP is generally not recommended, better to not use Windows.
+
 > [!Important]
 > No changes needed for UNIX
 
