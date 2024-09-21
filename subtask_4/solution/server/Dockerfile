@@ -1,26 +1,20 @@
 # Use an official Python runtime as a parent image
 FROM python:3.8-slim
 
-# Set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+# Set the working directory in the container
+WORKDIR /backend
 
-# Set work directory
-WORKDIR /app
+# Copy the current directory contents into the container 
+COPY . /backend
 
-# Install dependencies
-COPY requirements.txt .
-RUN pip install --upgrade pip
+# Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy project
-COPY . .
-
-# Install pytest for testing
-RUN pip install pytest
-
-# Expose port
+# Make port 80 available to the world outside this container
 EXPOSE 80
 
-# Define the default command to run the app
+# Define environment variable
+ENV NAME World
+
+# Run app.py when the container launches
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]

@@ -36,8 +36,8 @@ export default function Home() {
         }}
       ></video>
       <div className="w-full items-center justify-center font-mono bg-white relative z-10">
-        <h1 className="w-full text-2xl font-semibold pl-2 text-black" style={{ marginTop: "-60px" }}>
-          Datacurve
+        <h1 className="w-full text-2xl font-semibold pl-2 text-black" style={{ marginTop: '-60px' }}>
+          Datacurve 
         </h1>
       </div>
       <CodeEditor />

@@ -1,18 +1,18 @@
-import docker
-from fastapi import FastAPI, Body, Depends
-from sqlalchemy.orm import Session
-from database import SessionLocal, engine
-from models import Base, CodeSubmission
-from schemas import CodeRequest, CodeResponse, SubmitCodeResponse
+import subprocess
+import sys
+from typing import Union
+
+from database import SessionLocal
+from fastapi import Body, Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-import os
+from pydantic import BaseModel
+from schemas import CodeResult
+from sqlalchemy.orm import Session
+import docker
 
 app = FastAPI()
-# Initialize Docker client with base_url from environment variable
-docker_host = os.getenv('DOCKER_HOST', 'unix:///var/run/docker.sock')
-client = docker.DockerClient(base_url=docker_host)
 
-# Configure CORS
+
 origins = [
     "http://localhost",
     "http://localhost:3000",
@@ -26,9 +26,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Create all tables
-Base.metadata.create_all(bind=engine)
-
 def get_db():
     db = SessionLocal()
     try:
@@ -36,49 +33,87 @@ def get_db():
     finally:
         db.close()
 
-def run_code_in_docker(code: str) -> CodeResponse:
-    try:
-        # Escape the code to handle special characters and multi-line inputs
-        escaped_code = code.replace('"', '\\"').replace('\n', '\\n')
-        result = client.containers.run(
-            image="python:3.8-slim",
-            command=f'python -c "{escaped_code}"',
-            mem_limit="128m",
-            cpu_quota=50000,  # Limit CPU usage to 50%
-            network_disabled=True,
-            stdout=True,
-            stderr=True,
-            user="1000:1000",  # Run as non-root user
-            security_opt=["no-new-privileges"],  # Prevent privilege escalation
-            remove=True  # Remove the container after execution
-        )
-        output = result.decode('utf-8')
-        return CodeResponse(output=output, success=True)
-    except docker.errors.ContainerError as e:
-        error_message = e.stderr.decode('utf-8') if e.stderr else str(e)
-        return CodeResponse(error=error_message, success=False)
-    except docker.errors.ImageNotFound:
-        return CodeResponse(error="Docker image not found.", success=False)
-    except docker.errors.APIError as e:
-        return CodeResponse(error=f"Docker API error: {str(e)}", success=False)
-    except Exception as e:
-        return CodeResponse(error=f"Unexpected error: {str(e)}", success=False)
+class CodeRequest(BaseModel):
+    code: str
 
-@app.post("/run_code", response_model=CodeResponse)
-async def run_code(request: CodeRequest = Body(...)):
-    return run_code_in_docker(request.code)
+class CodeOutput(BaseModel):
+    output: str = ""
+    error: str = ""
+    success: bool = False
 
-@app.post("/submit_code", response_model=SubmitCodeResponse)
-async def submit_code(request: CodeRequest = Body(...), db: Session = Depends(get_db)):
-    result = run_code_in_docker(request.code)
+@app.post("/run_code")
+async def run_code(request: CodeRequest = Body()):
+    return _run_code(request.code)
+
+class SubmitCodeResponse(BaseModel):
+    code_output: CodeOutput
+    db_success: bool
+    error: Union[str, None] = None
+
+@app.post("/submit_code")
+async def submit_code(request: CodeRequest = Body(), db: Session = Depends(get_db)):
+    result = _run_code(request.code)
     if result.success:
         try:
-            submission = CodeSubmission(code=request.code, output=result.output)
-            db.add(submission)
-            db.commit()
-            db.refresh(submission)
+            create_code_result(code_result=CodeResult(code=request.code, output=result.output), db=db)
             return SubmitCodeResponse(code_output=result, db_success=True)
         except Exception as e:
-            return SubmitCodeResponse(code_output=result, db_success=False, error=str(e))
+            return SubmitCodeResponse(code_output=result, db_success=False, error=f"Failed to write to db: {e}")
     else:
-        return SubmitCodeResponse(code_output=result, db_success=False, error="Code execution failed.")
+        return SubmitCodeResponse(code_output=result, db_success=False)
+
+def _run_code(code):
+    try:
+        client = docker.from_env()
+        # Escape the code to handle special characters and multi-line inputs
+        escaped_code = code.replace('"', '\\"').replace('\n', '\\n')
+        print(escaped_code)
+        try:
+            container = client.containers.run(
+                "python:3.8-slim",
+                f'python -c "{escaped_code}"',
+                detach=True,
+                mem_limit="128m",
+                cpu_period=100000,
+                cpu_quota=50000,
+                network_disabled=True,
+                stdout=True,
+                stderr=True,
+                remove=False,  # Do not remove the container immediately
+                user="1000:1000",  # Run as non-root user
+                security_opt=["no-new-privileges"]  # Prevent privilege escalation
+            )
+            
+            result = container.wait()  # Ensure the container has finished executing
+            logs = container.logs(stdout=True, stderr=True)
+            
+            stdout, stderr = logs.split(b'\n', 1) if b'\n' in logs else (logs, b'')
+            container.remove()  # Remove the container after fetching logs
+            return CodeOutput(
+                output=stdout.decode('utf-8').strip(),
+                error=stderr.decode('utf-8').strip(),
+                success=result['StatusCode'] == 0
+            )
+        except docker.errors.ImageNotFound:
+            return CodeOutput(
+                error="Docker image not found. Please ensure the image 'python:3.8-slim' is available."
+            )
+        except docker.errors.ContainerError as e:
+            return CodeOutput(
+                error=f"Container error: {str(e)}"
+            )
+        except docker.errors.APIError as e:
+            return CodeOutput(
+                error=f"Docker API error: {str(e)}"
+            )
+    except Exception as e:
+        return CodeOutput(
+            error=f"Unexpected error: {str(e)}"
+        )
+
+def create_code_result(code_result: CodeResult, db: Session):
+    db_item = CodeResult(code=code_result.code, output=code_result.output)
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item

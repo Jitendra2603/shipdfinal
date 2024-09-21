@@ -1,10 +1,8 @@
-from sqlalchemy import Column, Integer, Text, DateTime, func
-from database import Base
+from sqlalchemy import Column, Integer, String
+from .database import Base
 
-class CodeSubmission(Base):
-    __tablename__ = "code_submissions"
-
-    id = Column(Integer, primary_key=True, index=True)
-    code = Column(Text, nullable=False)
-    output = Column(Text, nullable=False)
-    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+class CodeResult(Base):
+    __tablename__ = "code_result"
+    id = Column(Integer, primary_key=True)
+    code = Column(String)
+    output = Column(String)
