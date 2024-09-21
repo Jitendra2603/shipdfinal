@@ -35,46 +35,57 @@ class CodeResponse(BaseModel):
 
 def run_code_in_docker(code: str) -> CodeResponse:
     try:
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as temp_file:
-            temp_file.write(code)
-            temp_file_path = temp_file.name
-
-        container = client.containers.run(
-            image="python:3.8-slim",
-            command=f"python {os.path.basename(temp_file_path)}",
-            volumes={os.path.dirname(temp_file_path): {'bind': '/code', 'mode': 'ro'}},
-            working_dir="/code",
-            mem_limit="128m",
-            cpu_quota=50000,  # Limit CPU usage to 50%
-            network_disabled=True,
-            detach=True,
-            stdout=True,
-            stderr=True,
-            user="1000:1000",  # Run as non-root user
-            security_opt=["no-new-privileges"],  # Prevent privilege escalation
-        )
-
-        try:
-            container.wait(timeout=10)  # Wait for the container to finish with a 10-second timeout
-            output = container.logs().decode('utf-8')
-            return CodeResponse(output=output, success=True)
-        except docker.errors.NotFound:
-            return CodeResponse(error="Container was terminated due to resource constraints or timeout.", success=False)
-        finally:
+            # Encode the code as base64 to avoid issues with special characters
+            encoded_code = base64.b64encode(code.encode()).decode()
+            
+            container = client.containers.run(
+                image="python:3.8-slim",
+                command=f"python -c \"import base64, sys; "
+                        f"code = base64.b64decode('{encoded_code}').decode(); "
+                        f"exec(code)\"",
+                mem_limit="128m",
+                memswap_limit="128m",
+                cpu_quota=50000,  # Limit CPU usage to 50%
+                network_disabled=True,
+                detach=True,
+                user="1000:1000",  # Run as non-root user
+                security_opt=["no-new-privileges"],
+                cap_drop=["ALL"],  # Drop all capabilities
+                read_only=True,  # Make the container's root filesystem read-only    # Prevent privilege escalation
+            )
+    
+            def timeout_handler(signum, frame):
+                raise TimeoutError("Code execution timed out")
+    
+            signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(10)  # Set alarm for 10 seconds
+    
             try:
-                container.remove(force=True)
-            except docker.errors.NotFound:
-                pass  # Container already removed
-            os.unlink(temp_file_path)  # Remove the temporary file
+                result = container.wait()
+                stdout = container.logs(stdout=True, stderr=False).decode('utf-8').strip()
+                stderr = container.logs(stdout=False, stderr=True).decode('utf-8').strip()
+                
+                if result['StatusCode'] == 0:
+                    return CodeOutput(output=stdout, error=stderr, success=True)
+                else:
+                    return CodeOutput(output=stdout, error=stderr, success=False)
+            except TimeoutError:
+                return CodeOutput(error="Code execution timed out after 10 seconds.", success=False)
+            finally:
+                signal.alarm(0)  # Cancel the alarm
+                try:
+                    container.remove(force=True)
+                except docker.errors.NotFound:
+                    pass  # Container already removed
+        except docker.errors.ContainerError as e:
+            return CodeOutput(error=e.stderr.decode('utf-8'), success=False)
+        except docker.errors.ImageNotFound:
+            return CodeOutput(error="Docker image not found.", success=False)
+        except docker.errors.APIError as e:
+            return CodeOutput(error=f"Docker API error: {str(e)}", success=False)
+        except Exception as e:
+            return CodeOutput(error=f"Unexpected error: {str(e)}", success=False)
 
-    except docker.errors.ContainerError as e:
-        return CodeResponse(error=e.stderr.decode('utf-8'), success=False)
-    except docker.errors.ImageNotFound:
-        return CodeResponse(error="Docker image not found.", success=False)
-    except docker.errors.APIError as e:
-        return CodeResponse(error=f"Docker API error: {str(e)}", success=False)
-    except Exception as e:
-        return CodeResponse(error=f"Unexpected error: {str(e)}", success=False)
 
 @app.post("/run_code", response_model=CodeResponse)
 async def run_code(request: CodeRequest = Body(...)):
