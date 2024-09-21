@@ -5,9 +5,13 @@ Open your terminal or command prompt and navigate to the subtask_3 directory:
 ```
 cd C:\shipdfinal\subtask_3
 ```
-![Note]
-> Only for Windows
-Ensure Docker Daemon is Listening on TCP Port 2375
+
+> [!Note]
+> Only for Windows: Ensure Docker Daemon is Listening on TCP Port 2375
+> [!Caution]
+> Exposing the TCP is generally not recommended, better to not use Windows.
+> [!Important]
+> No changes needed for UNIX
 
 Verify that Docker is listening on tcp://localhost:2375:
 ```
@@ -41,8 +45,8 @@ python -m unittest test_main.py
 ```
 The tests will send requests to http://localhost:8000 and verify the responses.
 
-![Caution]
->Docker-in-Docker: To run Docker inside a Docker container (which is necessary for the backend to run code inside Docker containers), we mount the Docker socket from the host machine into the backend container:
+> [!Warning]
+> Docker-in-Docker: To run Docker inside a Docker container (which is necessary for the backend to run code inside Docker containers), we mount the Docker socket from the host machine into the backend container:
 
 ```
 volumes:
