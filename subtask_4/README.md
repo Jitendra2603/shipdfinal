@@ -16,14 +16,15 @@ cd server
 python -m unittest test_main.py
 ```
 
-![Note]
+> [!Note]
 > Alternative
 
 Demo
 
 https://github.com/Jitendra2603/code/assets/140426495/93166c52-037a-43d6-b137-45dec989f896
 
-Highly recommended, better than running docker:
+> [!Important]
+> Highly recommended, better than running docker
 
 FE:
 ```
