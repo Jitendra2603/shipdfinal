@@ -19,4 +19,5 @@ Once the containers are rebuilt, run the tests again using the following command
 ```
 docker-compose up
 ```
-Tests will be run automatically.
+> [!Note]
+> Tests will be run automatically.
