@@ -34,59 +34,63 @@ class CodeResponse(BaseModel):
     output: str = ""
     error: str = ""
     success: bool = False
+class CodeResponse(BaseModel):
+    output: str = ""
+    error: str = ""
+    success: bool = False
 
 def run_code_in_docker(code: str) -> CodeResponse:
     try:
-            # Encode the code as base64 to avoid issues with special characters
-            encoded_code = base64.b64encode(code.encode()).decode()
+        # Encode the code as base64 to avoid issues with special characters
+        encoded_code = base64.b64encode(code.encode()).decode()
+        
+        container = client.containers.run(
+            image="python:3.8-slim",
+            command=f"python -c \"import base64, sys; "
+                    f"code = base64.b64decode('{encoded_code}').decode(); "
+                    f"exec(code)\"",
+            mem_limit="128m",
+            memswap_limit="128m",
+            cpu_quota=50000,  # Limit CPU usage to 50%
+            network_disabled=True,
+            detach=True,
+            user="1000:1000",  # Run as non-root user
+            security_opt=["no-new-privileges"],
+            cap_drop=["ALL"],  # Drop all capabilities
+            read_only=True,  # Make the container's root filesystem read-only    # Prevent privilege escalation
+        )
+
+        def timeout_handler(signum, frame):
+            raise TimeoutError("Code execution timed out")
+
+        signal.signal(signal.SIGALRM, timeout_handler)
+        signal.alarm(10)  # Set alarm for 10 seconds
+
+        try:
+            result = container.wait()
+            stdout = container.logs(stdout=True, stderr=False).decode('utf-8').strip()
+            stderr = container.logs(stdout=False, stderr=True).decode('utf-8').strip()
             
-            container = client.containers.run(
-                image="python:3.8-slim",
-                command=f"python -c \"import base64, sys; "
-                        f"code = base64.b64decode('{encoded_code}').decode(); "
-                        f"exec(code)\"",
-                mem_limit="128m",
-                memswap_limit="128m",
-                cpu_quota=50000,  # Limit CPU usage to 50%
-                network_disabled=True,
-                detach=True,
-                user="1000:1000",  # Run as non-root user
-                security_opt=["no-new-privileges"],
-                cap_drop=["ALL"],  # Drop all capabilities
-                read_only=True,  # Make the container's root filesystem read-only    # Prevent privilege escalation
-            )
-    
-            def timeout_handler(signum, frame):
-                raise TimeoutError("Code execution timed out")
-    
-            signal.signal(signal.SIGALRM, timeout_handler)
-            signal.alarm(10)  # Set alarm for 10 seconds
-    
+            if result['StatusCode'] == 0:
+                return CodeResponse(output=stdout, error=stderr, success=True)
+            else:
+                return CodeResponse(output=stdout, error=stderr, success=False)
+        except TimeoutError:
+            return CodeResponse(error="Code execution timed out after 10 seconds.", success=False)
+        finally:
+            signal.alarm(0)  # Cancel the alarm
             try:
-                result = container.wait()
-                stdout = container.logs(stdout=True, stderr=False).decode('utf-8').strip()
-                stderr = container.logs(stdout=False, stderr=True).decode('utf-8').strip()
-                
-                if result['StatusCode'] == 0:
-                    return CodeOutput(output=stdout, error=stderr, success=True)
-                else:
-                    return CodeOutput(output=stdout, error=stderr, success=False)
-            except TimeoutError:
-                return CodeOutput(error="Code execution timed out after 10 seconds.", success=False)
-            finally:
-                signal.alarm(0)  # Cancel the alarm
-                try:
-                    container.remove(force=True)
-                except docker.errors.NotFound:
-                    pass  # Container already removed
-        except docker.errors.ContainerError as e:
-            return CodeOutput(error=e.stderr.decode('utf-8'), success=False)
-        except docker.errors.ImageNotFound:
-            return CodeOutput(error="Docker image not found.", success=False)
-        except docker.errors.APIError as e:
-            return CodeOutput(error=f"Docker API error: {str(e)}", success=False)
-        except Exception as e:
-            return CodeOutput(error=f"Unexpected error: {str(e)}", success=False)
+                container.remove(force=True)
+            except docker.errors.NotFound:
+                pass  # Container already removed
+    except docker.errors.ContainerError as e:
+        return CodeResponse(error=e.stderr.decode('utf-8'), success=False)
+    except docker.errors.ImageNotFound:
+        return CodeResponse(error="Docker image not found.", success=False)
+    except docker.errors.APIError as e:
+        return CodeResponse(error=f"Docker API error: {str(e)}", success=False)
+    except Exception as e:
+        return CodeResponse(error=f"Unexpected error: {str(e)}", success=False)
 
 
 @app.post("/run_code", response_model=CodeResponse)
