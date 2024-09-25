@@ -10,7 +10,7 @@ docker-compose build
 docker-compose up
 ```
 ```
-cd server
+cd subtask_4/tests
 ```
 ```
 python -m unittest test_main.py
