@@ -1,0 +1,9 @@
+services:
+  web:
+    build:
+      context: ./  # Adjust this to point directly to the folder containing your Dockerfile
+    ports:
+      - "5000:8000"  # Map host port 5000 to container port 8000
+    environment:
+      - DATABASE_URL=sqlite:///./test.db
+    command: ["pytest", "tests/test_main.py"]  # Run tests by default; adjust if needed
