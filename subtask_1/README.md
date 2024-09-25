@@ -8,7 +8,7 @@ cd shipdfinal/subtask_1
 Make the test script executable:
 
 ```
-chmod +x solution/client/tests/test.sh
+chmod +x tests/test.sh
 ```
 Run the test script:
 ```
@@ -16,7 +16,7 @@ Run the test script:
 ```
 or 
 ```
-sh solution/client/tests/test.sh
+sh tests/test.sh
 ```
 > [!Note]
 > On windows, you can directly run the above command on Git bash
@@ -54,7 +54,7 @@ Run the HTTP test script:
 ```
 or 
 ```
-sh solution/client/tests/test.sh
+sh tests/test.sh
 ```
 > [!Note]
 > On Windows, you can directly run the above command in Git Bash
