@@ -47,3 +47,5 @@ sqlalchemy
 docker
 numpy
 pandas
+uuid
+

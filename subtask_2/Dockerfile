@@ -17,4 +17,4 @@ RUN pip install pytest fastapi[testclient]
 EXPOSE 5000
 
 # Command to run the tests
-CMD ["python", "-m", "unittest", "discover", "-s", "tests"]
+CMD ["python", "solution/client/main.py"]

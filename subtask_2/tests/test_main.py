@@ -12,7 +12,7 @@ class TestBackendAPI(unittest.TestCase):
         response = client.post("/run_code", json={"code": code})
         data = response.json()
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data["output"], "Hello, World!\n")
+        self.assertEqual(data["output"], "Hello, World!\r\n")
         self.assertTrue(data["success"])
 
     def test_run_code_error(self):

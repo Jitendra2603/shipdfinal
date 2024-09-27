@@ -14,10 +14,18 @@ docker-compose build
 ```
 This will build the Docker images and install httpx and any other dependencies.
 
-Once the containers are rebuilt, run the tests again using the following command:
+Once the containers are rebuilt, run:
 
 ```
 docker-compose up
 ```
-> [!Note]
-> Tests will be run automatically.
+---
+# Tests
+
+```
+python -m unittest tests/test_main.py
+```
+or
+```
+python -m pytest tests/test_main.py
+```
