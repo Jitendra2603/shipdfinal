@@ -6,15 +6,21 @@ client = TestClient(app)
 
 class TestBackendAPI(unittest.TestCase):
 
+    import platform
+
     def test_run_code_success(self):
         """Test that the /run_code endpoint successfully executes valid code."""
         code = "print('Hello, World!')"
         response = client.post("/run_code", json={"code": code})
         data = response.json()
+    
+        # Determine the expected newline character based on the OS
+        expected_newline = '\n' if platform.system() != 'Windows' else '\r\n'
+    
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(data["output"], "Hello, World!\r\n")
+        self.assertEqual(data["output"], f"Hello, World!{expected_newline}")
         self.assertTrue(data["success"])
-
+        
     def test_run_code_error(self):
         """Test that the /run_code endpoint returns errors for invalid code."""
         code = "print(1/0)"
